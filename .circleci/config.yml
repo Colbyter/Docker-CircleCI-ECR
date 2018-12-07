@@ -1,0 +1,44 @@
+version: 2
+jobs:
+  build:
+    machine:
+        enabled: true
+    steps:
+      - checkout
+      - run:
+          command: $dockerbuild
+      - run:
+          command: |
+            pip install awscli --upgrade --user
+            eval $(aws ecr get-login --no-include-email --region us-east-1 | sed 's|https://||')
+            docker build -t docker-reg .
+            docker tag docker-reg:latest 232691314761.dkr.ecr.us-east-1.amazonaws.com/docker-reg:$CIRCLE_BUILD_NUM
+            docker push 232691314761.dkr.ecr.us-east-1.amazonaws.com/docker-reg:$CIRCLE_BUILD_NUM
+  test:
+    machine:
+        enabled: true
+    steps:
+      - checkout
+      - run:
+          command: |
+            docker build -t test .
+            docker run -d -p 10060:10060 test:latest
+            sleep 5
+            curl -I http://localhost:10060/liveness
+
+
+workflows:
+  version: 2
+  build_test:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: master
+          requires:
+            - test
+      - test:
+          filters:
+            branches:
+              only: master
+
