@@ -12,8 +12,8 @@ jobs:
             pip install awscli --upgrade --user
             eval $(aws ecr get-login --no-include-email --region us-east-1 | sed 's|https://||')
             docker build -t docker-reg .
-            docker tag docker-reg:latest 232691314761.dkr.ecr.us-east-1.amazonaws.com/docker-reg:$CIRCLE_BUILD_NUM
-            docker push 232691314761.dkr.ecr.us-east-1.amazonaws.com/docker-reg:$CIRCLE_BUILD_NUM
+            docker tag docker-reg:latest AWS_ACCNT_ID.dkr.ecr.us-east-1.amazonaws.com/docker-reg:$CIRCLE_BUILD_NUM
+            docker push AWS_ACCNT_ID.dkr.ecr.us-east-1.amazonaws.com/docker-reg:$CIRCLE_BUILD_NUM
   test:
     machine:
         enabled: true
